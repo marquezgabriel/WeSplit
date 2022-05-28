@@ -10,8 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var checkAmount = 0.0
     @State private var numberOfPeople = 2
-    @State private var tipPercentage = 20
-    let tipPercentages = [10, 15, 20, 25, 0]
+    @State private var tipPercentage = 15
     
     var totalPerPerson: Double {
         let peopleCount = Double(numberOfPeople + 2)
@@ -22,6 +21,14 @@ struct ContentView: View {
         let amountPerPerson = grandTotal / peopleCount
         
         return amountPerPerson
+    }
+    
+    var totalAmountCheck: Double {
+        let tipFactor = Double(tipPercentage)
+
+        let totalCheck =   checkAmount + (checkAmount * (tipFactor / 100))
+        
+        return totalCheck
     }
     
     @FocusState private var amountIsFocused: Bool
@@ -41,18 +48,26 @@ struct ContentView: View {
                 }
                 Section {
                     Picker("Tip percentage", selection: $tipPercentage) {
-                        ForEach(tipPercentages, id: \.self) {
+                        ForEach(0..<101) {
                             Text($0, format: .percent)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.automatic)
                 } header: {
                     Text("How much tip do you want to leave?")
                 }
-                
+                Section {
+                    Text (totalAmountCheck, format: .currency(code: Locale.current.currencyCode ?? "USD"))
+                }
+                    header: {
+                        Text("Total for the check")
+                    }
                 Section {
                     Text (totalPerPerson, format: .currency(code: Locale.current.currencyCode ?? "USD"))
                 }
+                    header: {
+                        Text("Amount to pay per person")
+                    }
             }
             .navigationTitle("WeSplit")
             .toolbar {
@@ -71,5 +86,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .previewInterfaceOrientation(.portrait)
     }
 }
